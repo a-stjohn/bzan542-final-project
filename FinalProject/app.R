@@ -19,6 +19,7 @@ library(shinycssloaders)
 library(dplyr)
 
 DATA = read.csv("Data1.csv", header = T)
+DATA = DATA[-c(1,2)]
 
 #make clusters for cores
 cluster <- makeCluster(detectCores() - 1)
@@ -76,12 +77,31 @@ ui <- fluidPage(# Application title
                 max = 10,
                 value = c(1,4)
             ),
-            
             selectInput("variable", "Please Select Value(s) for Decay (Neural Network):",
                         c(.0001,
                             .0005,.001,.005,.01,.05,.1,.2,.3,.4,.5),
-                          multiple = TRUE,selected =.01)
-            
+                          multiple = TRUE,selected =.01),
+            sliderInput(
+                "svmDegree",
+                "Please Input a Degree (Support Vector Machine):",
+                min = 1,
+                max = 10,
+                value = 3, # the optimal
+            ),
+            sliderInput(
+                "svmScale",
+                "Please Input a Scale (Support Vector Machine):",
+                min = 1e-04,
+                max = 0.9,
+                value = 0.001, # the optimal
+            ),
+            sliderInput(
+                "svmCost",
+                "Please Input a Cost (Support Vector Machine):",
+                min = 1,
+                max = 25,
+                value = 8, # the optimal
+            )
         ),
         
         # Create tabs
@@ -101,7 +121,12 @@ ui <- fluidPage(# Application title
             tabPanel(
                 "Neural Network",
                 plotOutput("NeuralNetwork") %>% withSpinner(color="#0dc5c1"),
-                verbatimTextOutput("NeurBest"))
+                verbatimTextOutput("NeurBest")),
+            tabPanel(
+                "Support Vector Machine",
+                plotOutput("svmAccuracy") %>% withSpinner(color="#0dc5c1")
+                # plotOutput("svmClassifier")
+            )
             
         )
     ))
@@ -187,6 +212,27 @@ server <- function(input, output) {
                 ntree = ntrees
             )
         vip(rfmod)
+    })
+    
+    output$svmAccuracy <- renderPlot({
+        # svm params
+        svmPolyGrid <-
+            expand.grid(
+                degree = 1:input$svmDegree,
+                scale = 1e-04:input$svmScale,
+                C = 2 ^ (1:input$svmCost)
+            )
+        
+        # svm mod
+        SVMpoly <- train(
+            GradeCat ~ .,
+            data = CLTRAIN,
+            method = 'svmPoly',
+            trControl = fitControl,
+            tuneGrid = svmPolyGrid,
+            preProc = c("center", "scale")
+        )
+        plot(SVMpoly)
     })
 }
 

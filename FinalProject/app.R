@@ -51,9 +51,9 @@ ui <- fluidPage(# Application title
                 "complexity",
                 "Please Input a Complexitity Parameter (Decision Tree):",
                 min = 0.005,
-                max = 0.05,
+                max = 0.2,
                 step = 0.005,
-                value = 0.04641589
+                value = 0.03
             ),
             sliderInput(
                 "mtry",
@@ -88,7 +88,10 @@ ui <- fluidPage(# Application title
         tabsetPanel(
             type = "tabs",
             # decision tree tab
-            tabPanel("Decision Tree", plotOutput("DecisionTree")), 
+            tabPanel("Decision Tree", 
+                     plotOutput("DecisionTree"),
+                     verbatimTextOutput("DecisionBest")
+                     ), 
             # random forest tab
             tabPanel(
                 "Random Forest",
@@ -110,6 +113,14 @@ server <- function(input, output) {
                       cp = input$complexity)
         # draw the tree
         visualize_model(TREE)
+    })
+    
+    output$DecisionBest <- renderPrint({
+        TREE <- train(GradeCat~.,data=CLTRAIN,method="rpart", tuneGrid=treeGrid,trControl=fitControl, preProc = c("center", "scale"))
+        
+        TREE$results[rownames(TREE$bestTune),]
+        
+        
     })
     
     output$NeuralNetwork <- renderPlot({

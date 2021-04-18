@@ -68,7 +68,20 @@ ui <- fluidPage(# Application title
                 min = 1,
                 max = 1000,
                 value = 500
-            )
+            ),
+            sliderInput(
+                "range",
+                "Please Input a Range of Values for Size of Expand Grid (Neural Network):",
+                min = 1,
+                max = 10,
+                value = c(1,4)
+            ),
+            
+            selectInput("variable", "Please Select Value(s) for Decay:",
+                        c(.0001,
+                            .0005,.001,.005,.01,.05,.1,.2,.3,.4,.5),
+                          multiple = TRUE,selected =.01)
+            
         ),
         
         # Create tabs
@@ -81,7 +94,9 @@ ui <- fluidPage(# Application title
                 "Random Forest",
                 plotOutput("rfAccuracy") %>% withSpinner(color="#0dc5c1"),
                 plotOutput("rfImportance") %>% withSpinner(color="#0dc5c1")
-            )
+            ),
+            tabPanel("Neural Network", plotOutput("NeuralNetwork"),verbatimTextOutput("NeurBest"))
+            
         )
     ))
 
@@ -94,8 +109,34 @@ server <- function(input, output) {
         visualize_model(TREE)
     })
     
+    output$NeuralNetwork <- renderPlot({
+        first<-input$range[1]
+        second<-input$range[2]
+        nnetGrid <- expand.grid(size=first:second,decay=input$variable)
+        NNET <- train(GradeCat~.,data=CLTRAIN,method='nnet',trControl=fitControl,tuneGrid=nnetGrid,trace=FALSE,linout=FALSE,preProc = c("center", "scale"))
+        # draw the tree
+        plot(NNET)
+       
+        #output$NeurBest<-renderPrint({NNET$results[rownames(NNET$bestTune),]})
+        
+    })
+    output$NeurBest <- renderPrint({
+        first<-input$range[1]
+        second<-input$range[2]
+        nnetGrid <- expand.grid(size=first:second,decay=input$variable)
+        NNET <- train(GradeCat~.,data=CLTRAIN,method='nnet',trControl=fitControl,tuneGrid=nnetGrid,trace=FALSE,linout=FALSE,preProc = c("center", "scale"))
+        
+        
+        
+        NNET$results[rownames(NNET$bestTune),]
+        
+    })
+    
+    
+    
     output$rfAccuracy <- renderPlot({
         # random forest params
+        
         forestGrid <- expand.grid(mtry = seq(1, input$mtry, by = 1))
         ntrees <- input$ntrees
         

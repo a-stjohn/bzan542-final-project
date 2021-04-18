@@ -109,7 +109,7 @@ ui <- fluidPage(# Application title
             type = "tabs",
             # decision tree tab
             tabPanel("Decision Tree", 
-                     plotOutput("DecisionTree"),
+                     plotOutput("DecisionTree") %>% withSpinner(color="#0dc5c1"),
                      verbatimTextOutput("DecisionBest")
                      ), 
             # random forest tab

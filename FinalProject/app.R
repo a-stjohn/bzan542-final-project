@@ -77,7 +77,7 @@ ui <- fluidPage(# Application title
                 value = c(1,4)
             ),
             
-            selectInput("variable", "Please Select Value(s) for Decay:",
+            selectInput("variable", "Please Select Value(s) for Decay (Neural Network):",
                         c(.0001,
                             .0005,.001,.005,.01,.05,.1,.2,.3,.4,.5),
                           multiple = TRUE,selected =.01)
@@ -95,7 +95,10 @@ ui <- fluidPage(# Application title
                 plotOutput("rfAccuracy") %>% withSpinner(color="#0dc5c1"),
                 plotOutput("rfImportance") %>% withSpinner(color="#0dc5c1")
             ),
-            tabPanel("Neural Network", plotOutput("NeuralNetwork"),verbatimTextOutput("NeurBest"))
+            tabPanel(
+                "Neural Network",
+                plotOutput("NeuralNetwork") %>% withSpinner(color="#0dc5c1"),
+                verbatimTextOutput("NeurBest"))
             
         )
     ))

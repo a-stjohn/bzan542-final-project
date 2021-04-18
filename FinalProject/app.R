@@ -61,7 +61,7 @@ ui <- fluidPage(# Application title
                 "Please Input an mtry Parameter (Random Forest):",
                 min = 1,
                 max = 100,
-                value = 25
+                value = 24
             ),
             sliderInput(
                 "ntrees",
@@ -125,7 +125,6 @@ ui <- fluidPage(# Application title
             tabPanel(
                 "Support Vector Machine",
                 plotOutput("svmAccuracy") %>% withSpinner(color="#0dc5c1")
-                # plotOutput("svmClassifier")
             )
             
         )

@@ -86,21 +86,21 @@ ui <- fluidPage(# Application title
                 "Please Input a Degree (Support Vector Machine):",
                 min = 1,
                 max = 10,
-                value = 3, # the optimal
+                value = 2, # the optimal
             ),
             sliderInput(
                 "svmScale",
                 "Please Input a Scale (Support Vector Machine):",
                 min = 1e-04,
                 max = 0.9,
-                value = 0.001, # the optimal
+                value = 0.0001, # the optimal
             ),
             sliderInput(
                 "svmCost",
                 "Please Input a Cost (Support Vector Machine):",
                 min = 1,
                 max = 25,
-                value = 8, # the optimal
+                value = 4, # the optimal
             )
         ),
         

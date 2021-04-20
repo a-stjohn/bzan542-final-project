@@ -75,7 +75,7 @@ ui2 <- fluidPage(
                    "Please Input an mtry Parameter (Random Forest):",
                    min = 1,
                    max = 31,
-                   value = 5
+                   value = 20
                  ),
                  sliderInput(
                    "ntrees",
@@ -119,8 +119,10 @@ ui2 <- fluidPage(
                    # the optimal
                  )
                ),
-               mainPanel(plotOutput("svmAccuracy") %>% withSpinner(color =
-                                                                     "#0dc5c1"))
+               mainPanel(
+                 verbatimTextOutput("svmSummary") %>% withSpinner(color = "#0dc5c1"),
+                 plotOutput("svmAccuracy") %>% withSpinner(color = "#0dc5c1")
+               )
              )),
     
     
@@ -254,7 +256,7 @@ server <- function(input, output) {
         ntree = ntrees
       )
     
-    rfmod$results[rfmod$results$mtry == rfmod$bestTune$mtry, ]
+    rfmod$results[which.max(rfmod$results$Accuracy), ]
   })
   
   output$svmAccuracy <- renderPlot({
@@ -278,6 +280,27 @@ server <- function(input, output) {
     plot(SVMpoly)
   })
   
+  output$svmSummary <- renderPrint({
+    # svm params
+    svmPolyGrid <-
+      expand.grid(
+        degree = 1:input$svmDegree,
+        scale = 1e-04:input$svmScale,
+        C = 2 ^ (1:input$svmCost)
+      )
+    
+    # svm mod
+    SVMpoly <- train(
+      GradeCat ~ .,
+      data = CLTRAIN,
+      method = 'svmPoly',
+      trControl = fitControl,
+      tuneGrid = svmPolyGrid,
+      preProc = c("center", "scale")
+    )
+    
+    SVMpoly$results[which.max(SVMpoly$results$Accuracy),]
+  })
   
   output$NeuralNetwork <- renderPlot({
     first <- input$range[1]

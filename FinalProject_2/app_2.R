@@ -12,25 +12,6 @@ library(regclass)
 library(ggplot2)
 
 load("542.RData")
-# save(data1, DATA, CLTRAIN, CLTEST, nrows, file = "542.RData")
-data1$GradeCat[which(data1$G3 < 10)] <- "Failed"
-data1$GradeCat[which(data1$G3 >= 10)] <- "Passed"
-nrows <- sample(nrow(data1), size = 0.8 * nrow(data1))
-
-#GradeCat is the response
-colnames(data1)
-CLTRAIN <-
-  data1[nrows,-which(colnames(data1) %in% c("G3", "intercept", "meanGradeCatabsences", "X"))]
-CLTEST <-
-  data1[-nrows,-which(colnames(data1) %in% c("G3", "intercept", "meanGradeCatabsences", "X"))]
-length(colnames(CLTRAIN)) #31 possible x vars
-DATA <- data1[, which(colnames(data1) %in% colnames(CLTRAIN))]
-
-
-CLTRAIN <-
-  CLTRAIN[, c(1:29, which(colnames(CLTRAIN) %in% c("K5", "K6", "K7")))]
-CLTEST <-
-  CLTEST[, c(1:29, which(colnames(CLTEST) %in% c("K5", "K6", "K7")))]
 
 ui2 <- fluidPage(
   titlePanel("App"),
@@ -142,7 +123,7 @@ ui2 <- fluidPage(
                    c(.0001,
                      .0005, .001, .005, .01, .05, .1, .2, .3, .4, .5),
                    multiple = TRUE,
-                   selected = .01
+                   selected = c(.001, .01, .05)
                  )
                  
                  
@@ -194,7 +175,7 @@ server <- function(input, output) {
         preProc = c("center", "scale")
       )
     
-    TREE$results[rownames(TREE$bestTune),]
+    TREE$results[rownames(TREE$bestTune), ]
   })
   
   
@@ -256,7 +237,7 @@ server <- function(input, output) {
         ntree = ntrees
       )
     
-    rfmod$results[which.max(rfmod$results$Accuracy), ]
+    rfmod$results[which.max(rfmod$results$Accuracy),]
   })
   
   output$svmAccuracy <- renderPlot({
@@ -299,7 +280,7 @@ server <- function(input, output) {
       preProc = c("center", "scale")
     )
     
-    SVMpoly$results[which.max(SVMpoly$results$Accuracy),]
+    SVMpoly$results[which.max(SVMpoly$results$Accuracy), ]
   })
   
   output$NeuralNetwork <- renderPlot({
@@ -343,7 +324,7 @@ server <- function(input, output) {
     
     
     
-    NNET$results[rownames(NNET$bestTune),]
+    NNET$results[rownames(NNET$bestTune), ]
     
   })
   

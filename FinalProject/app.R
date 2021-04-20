@@ -17,6 +17,7 @@ library(rpart.plot)
 library(regclass)
 library(shinycssloaders)
 library(dplyr)
+library(ggplot2)
 
 DATA = read.csv("Data1.csv", header = T)
 DATA = DATA[-c(1,2)]
@@ -48,6 +49,9 @@ ui <- fluidPage(# Application title
     # Sidebar for input params
     sidebarLayout(
         sidebarPanel(
+            selectInput("Variable", "Column (Descriptive Statistics)", 
+                        choices = colnames(DATA)
+            ),
             numericInput(
                 "complexity",
                 "Please Input a Complexitity Parameter (Decision Tree):",
@@ -107,6 +111,11 @@ ui <- fluidPage(# Application title
         # Create tabs
         tabsetPanel(
             type = "tabs",
+            tabPanel(
+                "Descriptive Statistics",
+                plotOutput("Descriptive") %>% withSpinner(color="#0dc5c1"),
+                textOutput('type')
+            ),
             # decision tree tab
             tabPanel("Decision Tree", 
                      plotOutput("DecisionTree") %>% withSpinner(color="#0dc5c1"),
@@ -131,6 +140,20 @@ ui <- fluidPage(# Application title
     ))
 
 server <- function(input, output) {
+    output$Descriptive <- renderPlot({
+        
+        if (is.numeric(DATA[,input$Variable][[1]])){
+            
+            # histogram for continuous variable
+            ggplot(DATA,aes_string(x=input$Variable)) + geom_histogram(bins=10)
+            
+        } else {
+            
+            # barplot for categorical variable
+            ggplot(DATA,aes_string(x=input$Variable))+ geom_bar()
+            
+        }
+    })
     output$DecisionTree <- renderPlot({
         TREE <- rpart(GradeCat ~ .,
                       data = CLTRAIN,

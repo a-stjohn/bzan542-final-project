@@ -13,7 +13,8 @@ library(ggplot2)
 library(ROSE) 
 
 load("542.RData")
-DATA=ovun.sample(GradeCat~.,data = DATA,method = "over",N=530)$data
+
+DATA<-ovun.sample(GradeCat~.,data = DATA,method = "over",N=530)$data
 nrows<-sample(nrow(DATA),size = 0.8*nrow(DATA))
 CLTRAIN<-DATA[nrows,]
 CLTEST<-DATA[-nrows,]

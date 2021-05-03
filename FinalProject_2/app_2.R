@@ -10,27 +10,32 @@ library(shinycssloaders)
 library(dplyr)
 library(regclass)
 library(ggplot2)
+library(ROSE)
 
 load("542.RData")
+DATA=ovun.sample(GradeCat~.,data = data1,method = "over",N=530)$data
+CLTRAIN<-DATA[nrows,-which(colnames(DATA) %in% c("G3","intercept","meanGradeCatabsences","X"))]
+CLTEST<-DATA[-nrows,-which(colnames(DATA) %in% c("G3","intercept","meanGradeCatabsences","X"))]
+
 # save(data1, DATA, CLTRAIN, CLTEST, nrows, file = "542.RData")
-data1$GradeCat[which(data1$G3 < 10)] <- "Failed"
-data1$GradeCat[which(data1$G3 >= 10)] <- "Passed"
-nrows <- sample(nrow(data1), size = 0.8 * nrow(data1))
+#data1$GradeCat[which(data1$G3 < 10)] <- "Failed"
+#data1$GradeCat[which(data1$G3 >= 10)] <- "Passed"
+#nrows <- sample(nrow(data1), size = 0.8 * nrow(data1))
 
 #GradeCat is the response
-colnames(data1)
-CLTRAIN <-
-  data1[nrows,-which(colnames(data1) %in% c("G3", "intercept", "meanGradeCatabsences", "X"))]
-CLTEST <-
-  data1[-nrows,-which(colnames(data1) %in% c("G3", "intercept", "meanGradeCatabsences", "X"))]
-length(colnames(CLTRAIN)) #31 possible x vars
-DATA <- data1[, which(colnames(data1) %in% colnames(CLTRAIN))]
+#colnames(data1)
+#CLTRAIN <-
+  #data1[nrows,-which(colnames(data1) %in% c("G3", "intercept", "meanGradeCatabsences", "X"))]
+#CLTEST <-
+  #data1[-nrows,-which(colnames(data1) %in% c("G3", "intercept", "meanGradeCatabsences", "X"))]
+#length(colnames(CLTRAIN)) #31 possible x vars
+#DATA <- data1[, which(colnames(data1) %in% colnames(CLTRAIN))]
 
 
-CLTRAIN <-
-  CLTRAIN[, c(1:29, which(colnames(CLTRAIN) %in% c("K5", "K6", "K7")))]
-CLTEST <-
-  CLTEST[, c(1:29, which(colnames(CLTEST) %in% c("K5", "K6", "K7")))]
+#CLTRAIN <-
+  #CLTRAIN[, c(1:29, which(colnames(CLTRAIN) %in% c("K5", "K6", "K7")))]
+#CLTEST <-
+  #CLTEST[, c(1:29, which(colnames(CLTEST) %in% c("K5", "K6", "K7")))]
 
 ui2 <- fluidPage(
   titlePanel("App"),
@@ -57,7 +62,7 @@ ui2 <- fluidPage(
                    "Please Input a Complexitity Parameter (Decision Tree):",
                    min = 0.005,
                    max = 0.2,
-                   step = 0.005,
+                   step = 0.001,
                    value = 0.03
                  )
                ),

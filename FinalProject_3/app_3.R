@@ -12,12 +12,12 @@ library(regclass)
 library(ggplot2)
 library(ROSE) 
 
-load("542.RData")
+load("542_v2.RData")
 
-DATA<-ovun.sample(GradeCat~.,data = DATA,method = "over",N=530)$data
-nrows<-sample(nrow(DATA),size = 0.8*nrow(DATA))
-CLTRAIN<-DATA[nrows,]
-CLTEST<-DATA[-nrows,]
+# DATA<-ovun.sample(GradeCat~.,data = DATA,method = "over",N=530)$data
+# nrows<-sample(nrow(DATA),size = 0.8*nrow(DATA))
+# CLTRAIN<-DATA[nrows,]
+# CLTEST<-DATA[-nrows,]
 
 # save(data1, DATA, CLTRAIN, CLTEST, nrows, file = "542.RData")
 #data1$GradeCat[which(data1$G3 < 10)] <- "Failed"
